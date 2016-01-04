@@ -1,0 +1,30 @@
+{
+  "name": "final-tickets-client",
+  "version": "1.0.0",
+  "description": "ticketing system client side",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/aaronvine/final-tickets-client.git"
+  },
+  "author": "Aaron Vinestock",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aaronvine/final-tickets-client/issues"
+  },
+  "homepage": "https://github.com/aaronvine/final-tickets-client#readme",
+  "devDependencies": {
+    "browserify": "^12.0.1",
+    "gulp": "^3.9.0",
+    "gulp-clean": "^0.3.1",
+    "gulp-protractor": "^2.1.0",
+    "gulp-rimraf": "^0.2.0",
+    "gulp-sass": "^2.1.1",
+    "gulp-watch": "^4.3.5",
+    "karma": "^0.13.16",
+    "tsify": "^0.13.1"
+  }
+}
