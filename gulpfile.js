@@ -1,15 +1,16 @@
+'use strict';
 var gulp = require('gulp');
-var uglify = require('gulp-uglify');
-var concat = require('gulp-concat');
+var source = require('vinyl-source-stream');
 var webServer = require('gulp-webserver');
 var rimraf = require('gulp-rimraf');
 var sass = require('gulp-sass');
 var tsify = require('tsify');
 var browserify = require('browserify');
-var karma = require('karma');
+var glob = require('glob');
+var Server = require('karma').Server;
 
 gulp.task('clean', function () {
-    gulp.src('./dist/*', './tmp/*', { read: false })
+    gulp.src('./dist/*', { read: false })
         .pipe(rimraf());
 });
 
@@ -22,30 +23,38 @@ gulp.task('serve', function () {
 });
 
 gulp.task('sass', function () {
-    gulp.src('./styles/*.scss')
+    gulp.src('./src/*.scss')
     .pipe(sass().on('error', sass.logError))
     .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('js', function () {
-    browserify()
-        .add('./src/**/*.ts')
-        .plugin(tsify, { noImplicitAny: true })
+    browserify('./src/tickets.mdl.ts')
+        .plugin(tsify)
         .bundle()
         .on('error', function (error) {
             console.error(error.toString());
         })
-        .pipe(concat('tickets-app.js'))
-        .pipe(uglify())
+        .pipe(source('bundle.js'))
         .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('build-tests', function () {
-    //TODO
+    browserify(glob.sync('src/**/*.test.ts'))
+        .plugin(tsify)
+        .bundle()
+        .on('error', function (error) {
+            console.error(error.toString());
+        })
+        .pipe(source('bundle.test.js'))
+        .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('test', function () {
-    //TODO
+gulp.task('test', function (done) {
+    new Server({
+        configFile: __dirname + '/karma.conf.js',
+        singleRun: true
+    }, done).start();
 });
 
 gulp.task('e2e', function () {
@@ -53,5 +62,7 @@ gulp.task('e2e', function () {
 });
 
 gulp.task('watch', function () {
-    //TODO
+    gulp.watch('src/*.ts', ['js']);
 });
+
+gulp.task('default', ['js', 'serve', 'watch']);
