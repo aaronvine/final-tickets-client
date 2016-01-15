@@ -19,6 +19,7 @@
   "globals": {
     "console": true,
     "_": false,
+    "__dirname": false,
     "angular": false,
     "require": false,
     "module": false,

@@ -40,7 +40,7 @@ gulp.task('js', function () {
 });
 
 gulp.task('build-tests', function () {
-    browserify(glob.sync('src/**/*.test.ts'))
+    browserify(glob.sync('./src/**/*.test.ts'))
         .plugin(tsify)
         .bundle()
         .on('error', function (error) {
@@ -53,7 +53,7 @@ gulp.task('build-tests', function () {
 gulp.task('test', function (done) {
     new Server({
         configFile: __dirname + '/karma.conf.js',
-        singleRun: true
+        singleRun: false
     }, done).start();
 });
 
@@ -62,7 +62,7 @@ gulp.task('e2e', function () {
 });
 
 gulp.task('watch', function () {
-    gulp.watch('src/*.ts', ['js']);
+    gulp.watch('./src/**/*.ts', ['js']);
 });
 
 gulp.task('default', ['js', 'serve', 'watch']);

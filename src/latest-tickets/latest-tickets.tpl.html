@@ -1,0 +1,4 @@
+<h3>Latest Tickets:</h3>
+<ul class="latest-tickets-list">
+  <li class="ticket" ng-repeat="ticket in ctrl.items.getTicketList()"><b>{{ticket.getTicketTitle()}}</b><<br><pre>{{ticket.getTicketContent().split("\n")[0]}}</pre></li>
+</ul>

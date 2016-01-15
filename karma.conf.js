@@ -14,6 +14,9 @@ module.exports = function (config) {
             'https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js',
             'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.4/angular.min.js',
             'https://ajax.googleapis.com/ajax/libs/angularjs/1.3.4/angular-mocks.js',
+            'http://angular-ui.github.io/ui-router/release/angular-ui-router.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/q.js/1.0.1/q.min.js',
+            './dist/bundle.js',
             './dist/bundle.test.js'
         ],
         // list of files to exclude

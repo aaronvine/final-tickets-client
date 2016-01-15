@@ -35,8 +35,8 @@ var TicketList = (function () {
     TicketList.prototype.addNewTicket = function (newTicket) {
         this.myTicketList.push(newTicket);
     };
-    TicketList.prototype.removeTicket = function (ticketToRemove) {
-        this.myTicketList.splice(this.myTicketList.indexOf(ticketToRemove), 1);
+    TicketList.prototype.updateTicketList = function (updatedTicketList) {
+        this.myTicketList = updatedTicketList;
     };
     TicketList.uuid = function () {
         return Math.floor(Math.random() * 999999).toString(36);
@@ -55,20 +55,22 @@ exports["default"] = TicketList;
 },{"./ticket":1}],3:[function(require,module,exports){
 var LatestTicketsDriver = (function () {
     function LatestTicketsDriver(elem, scope) {
-        var _this = this;
         this.elem = elem;
         this.scope = scope;
-        inject(function ($timeout) { return _this.$timeout = $timeout; });
     }
     LatestTicketsDriver.build = function (items) {
         var elem, scope;
-        inject(function ($compile, $rootScope) {
+        inject(function ($rootScope, $compile, ticketsService) {
             scope = $rootScope.$new();
+            scope.title = 'testing latest tickets';
             scope.items = items;
-            elem = $compile("<latest-tickets ng-model='items'></latest-tickets>")(scope);
+            elem = $compile('<latest-tickets ng-model="items"></latest-tickets>')(scope);
             scope.$digest();
         });
         return new LatestTicketsDriver(elem, scope);
+    };
+    LatestTicketsDriver.prototype.getLatestTicketsTitle = function () {
+        return this.elem.find('h3').text();
     };
     LatestTicketsDriver.prototype.getTicketListLength = function () {
         return this.elem.find('.ticket').length;
@@ -89,10 +91,25 @@ exports["default"] = LatestTicketsDriver;
 var ticketList_1 = require('../common/ticketList');
 var latest_tickets_driver_1 = require('./latest-tickets-driver');
 describe('latest-tickets directive', function () {
-    it('should return true', function () {
-        expect(true).toBeTruthy;
+    beforeEach(function () {
+        angular.mock.module('tickets');
     });
-    beforeEach(angular.mock.module('tickets'));
+    fit('should render the title based on the given title', inject(function (ticketsService) {
+        // let testsPromise =   ticketsService.getTestsPromise();
+        var items = ticketList_1["default"].generateRandomTicketList();
+        var length = items.getTicketList().length;
+        // let deferred = Q.defer();
+        // let promise = deferred.promise;
+        spyOn(ticketsService, 'getTicketsPromise').and.returnValue(Q(function (resolve) { return resolve('resolved promise'); }));
+        // deferred.resolve('tickets get request has been resolved!');
+        console.log('buliding driver');
+        var latestTicketsDriver = latest_tickets_driver_1["default"].build(items);
+        // testsPromise
+        // .then((message: string) => {
+        //   console.log(message);
+        expect(latestTicketsDriver.getLatestTicketsTitle()).toBe('testing latest tickets');
+        // });
+    }));
     it('should render the latest tickets based on the list of tickets', function () {
         var items = ticketList_1["default"].generateRandomTicketList();
         var length = items.getTicketList().length;

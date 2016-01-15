@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head lang="en">
-    <meta charset="UTF-8">
-    <title>Tickets</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.4/angular.min.js"></script>
-    <script src="./dist/bundle.js"></script>
+  <meta charset="UTF-8">
+  <title>Tickets</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/q.js/1.0.1/q.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.4/angular.min.js"></script>
+  <script src="http://angular-ui.github.io/ui-router/release/angular-ui-router.js"></script>
+  <script src="./dist/bundle.js"></script>
 </head>
-<body ng-app="tickets" ng-controller="ticketsCtrl as ctrl">
-    {{ctrl.greetings}}
+<body ng-app="tickets">
+  <ui-view></ui-view>
 </body>
 </html>

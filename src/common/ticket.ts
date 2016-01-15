@@ -14,19 +14,19 @@ class Ticket {
   }
 
   getTicketId(): string {
-      return this.id;
+    return this.id;
   }
 
   getTicketTitle(): string {
-      return this.title;
+    return this.title;
   }
 
   getTicketContent(): string {
-      return this.content;
+    return this.content;
   }
 
   getTicketUserEmail(): string {
-      return this.userEmail;
+    return this.userEmail;
   }
 
 }

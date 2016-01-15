@@ -5,7 +5,7 @@ class TicketList {
   myTicketList: Ticket[];
 
   constructor(myTicketList: Ticket[]) {
-    this.myTicketList = myTicketList;
+      this.myTicketList = myTicketList;
   }
 
   getTicketList(): Ticket[] {
@@ -16,8 +16,8 @@ class TicketList {
       this.myTicketList.push(newTicket);
   }
 
-  removeTicket(ticketToRemove: Ticket): void {
-        this.myTicketList.splice(this.myTicketList.indexOf(ticketToRemove), 1);
+  updateTicketList(updatedTicketList: Ticket[]): void {
+      this.myTicketList = updatedTicketList;
   }
 
   static uuid() {
