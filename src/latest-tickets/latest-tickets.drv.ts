@@ -9,16 +9,19 @@ class LatestTicketsDirectiveController {
 
   /* @ngInject */
   constructor($parse: ng.IParseService, $element: any, $scope: any, ticketsService: TicketsService) {
-    console.log('builiding the controller, waiting for the promise to be resolved');
+    console.log('builiding the latest-tickets controller, waiting for the promise to be resolved');
     ticketsService.getTicketsPromise()
     .then((message: string) => {
         console.log(message);
-        this.items = $parse($element.attr('ng-model'))($scope.$parent);
+        let tempItemsList = $parse($element.attr('ng-model'))($scope.$parent).getTicketList();
+        let myItemsList = $.extend(true, [], tempItemsList);
+        this.items = new TicketList(myItemsList);
         console.log('items: ', this.items);
         this.items.updateTicketList(this.items.getTicketList().splice(this.items.getTicketList().length - this.itemsLimit, this.itemsLimit));
         $scope.items = this.items;
         $scope.title = this.title;
-        $scope.$apply();
+        $scope.$digest();
+        ticketsService.setTicketsPromise();
       });
   }
 }

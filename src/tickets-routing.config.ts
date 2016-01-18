@@ -9,8 +9,10 @@ export default function ticketsRoutingConfig($stateProvider: ng.ui.IStateProvide
       .state('home', {
         url: '/',
         template: '<h1>{{ctrl.greetings}}</h1>' +
-                  '<latest-tickets ng-model=ctrl.tickets></latest-tickets>',
-        controller: function (ticketsService: TicketsService) {
+                  '<search></search>' +
+                  '<latest-tickets ng-model=ctrl.tickets></latest-tickets>' +
+                  '<a ui-sref="submit"><b>Submit a new ticket</b></a>',
+        controller: function (ticketsService: TicketsService, $scope: any) {
           ticketsService.getGreetingsMessage()
             .then((data) => {
               this.greetings = data;
@@ -28,14 +30,9 @@ export default function ticketsRoutingConfig($stateProvider: ng.ui.IStateProvide
         resolve: {
             ticket: function ($stateParams, ticketsService: TicketsService, $state) {
                 try {
-                  // console.log('builiding the routing config, waiting for the promise to be resolved');
-                  // ticketsService.getTicketsPromise()
-                  // .then((message: string) => {
-                  //   console.log('config prmoise has been resolved');
                     return ticketsService.globalTicketList.getTicketList().filter(function (ticket) {
                       return ticket.getTicketId() === $stateParams.ticketId;
                     })[0];
-                  // });
                 } catch (e) {
                   console.error(e);
                   $state.go('404');
@@ -48,7 +45,15 @@ export default function ticketsRoutingConfig($stateProvider: ng.ui.IStateProvide
           this.item = ticket;
         },
         controllerAs: 'ctrl'
-    })
+      })
+      .state('submit', {
+        url: '/submit',
+        template: '<ticket-submit></ticket-submit>',
+        controller: function () {
+          console.log('UI ROUTE: TICKET SUBMIT');
+        },
+        controllerAs: 'ctrl'
+      })
         .state('404', {
             template: '<h2>404!</h2>'
         });

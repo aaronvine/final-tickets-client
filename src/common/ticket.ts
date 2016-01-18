@@ -5,12 +5,14 @@ class Ticket {
   title: string;
   content: string;
   userEmail: string;
+  replies: {}[];
 
-  constructor(id: string, title: string, content: string, userEmail: string) {
+  constructor(id: string, title: string, content: string, userEmail: string, replies: {}[]) {
     this.id = id;
     this.title = title;
     this.content = content;
     this.userEmail = userEmail;
+    this.replies = replies;
   }
 
   getTicketId(): string {
@@ -27,6 +29,10 @@ class Ticket {
 
   getTicketUserEmail(): string {
     return this.userEmail;
+  }
+
+  getTicketReplies(): {}[] {
+    return this.replies;
   }
 
 }

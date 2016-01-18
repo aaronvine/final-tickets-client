@@ -4,10 +4,15 @@ import Ticket from '../common/ticket';
 
 class TicketViewDirectiveController {
   ticket: Ticket;
+  ticketReplies: {}[];
+  ticketId: string;
 
   /* @ngInject */
-  constructor($scope: any) {
+  constructor(ticketsService: TicketsService, $scope: any) {
     this.ticket = $scope.ticket;
+    this.ticketReplies = this.ticket.getTicketReplies();
+    this.ticketId = this.ticket.getTicketId();
+    console.log('ticket-id(ticket view): ', this.ticketId);
   };
 }
 
@@ -17,10 +22,12 @@ export default function TicketViewDirectiveFactory(): ng.IDirective {
     scope: {
       ticket: '='
     },
-    template: '<h3>Ticket ID: #{{ctrl.ticket.getTicketId()}} , User Email: <a ui-sref="user-tickets({email: ctrl.ticket.getTicketUserEmail()})">{{ctrl.ticket.getTicketUserEmail()}}</a></h3>' +
+    template: '<h3>From: <a ui-sref="user-tickets({email: ctrl.ticket.getTicketUserEmail()})">{{ctrl.ticket.getTicketUserEmail()}}</a></h3>' +
               '<ul class="latest-tickets-list">' +
                 '<li class="ticket" <b>{{ctrl.ticket.getTicketTitle()}}</b><br><pre>{{ctrl.ticket.getTicketContent()}}</pre></li>' +
-              '</ul>',
+              '</ul>' +
+              '<replies ng-model="ctrl.ticketReplies"></replies>' +
+              '<reply-submit id="{{ctrl.ticketId}}"></reply-submit>',
     controller: TicketViewDirectiveController,
     controllerAs: 'ctrl'
   };
