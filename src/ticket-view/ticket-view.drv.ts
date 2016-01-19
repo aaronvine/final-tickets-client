@@ -22,7 +22,7 @@ export default function TicketViewDirectiveFactory(): ng.IDirective {
     scope: {
       ticket: '='
     },
-    template: '<h3>From: <a ui-sref="user-tickets({email: ctrl.ticket.getTicketUserEmail()})">{{ctrl.ticket.getTicketUserEmail()}}</a></h3>' +
+    template: '<h3>From: {{ctrl.ticket.getTicketUserEmail()}}</h3>' +
               '<ul class="latest-tickets-list">' +
                 '<li class="ticket" <b>{{ctrl.ticket.getTicketTitle()}}</b><br><pre>{{ctrl.ticket.getTicketContent()}}</pre></li>' +
               '</ul>' +
