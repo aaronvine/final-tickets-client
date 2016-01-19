@@ -89,7 +89,7 @@ export default function SearchDirectiveFactory(): ng.IDirective {
     restrict: 'E',
     scope: {
     },
-    template: '<div class="label">Search For A Ticket</div>' +
+    template: '<h3>Search For A Ticket</h3>' +
               '<input type="text" placeholder="Search for tickets" class="input" ng-keydown="ctrl.checkKeyDown($event)" ng-keyup="ctrl.checkKeyUp($event)" ng-model="ctrl.searchText" ng-change="ctrl.search()"/>' +
               '<ul class="suggestions-list">' +
                 '<li ng-repeat="suggestion in ctrl.suggestions track by $index" ng-class="suggestion" ng-click="ctrl.goToTicketView($index)"><a ui-sref="ticket({ticketId: suggestion.getTicketId()})">{{suggestion.getTicketTitle()}}</a></li>' +

@@ -7,7 +7,7 @@ class ReplySubmitDirectiveController {
   isSubmitted: boolean;
 
   /* @ngInject */
-  constructor(private ticketsService: TicketsService, $scope: any) {
+  constructor(private ticketsService: TicketsService, private $state: any) {
     this.newReply = {};
     this.isSubmitted = false;
   };
@@ -17,6 +17,10 @@ class ReplySubmitDirectiveController {
     this.isSubmitted = true;
     this.ticketsService.postNewReplyToServer(id, this.newReply);
     //maybe should clear the newReply field
+    this.ticketsService.getReplySubmitPromise()
+    .then(() => {
+      this.$state.go('home');
+    });
   }
 }
 

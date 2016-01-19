@@ -6,7 +6,6 @@ export default class LatestTicketsDriver {
 
   elem: JQuery;
   scope;
-  $timeout: ng.ITimeoutService;
 
   constructor(elem, scope) {
     this.elem = elem;

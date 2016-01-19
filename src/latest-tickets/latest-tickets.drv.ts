@@ -22,6 +22,8 @@ class LatestTicketsDirectiveController {
         $scope.title = this.title;
         $scope.$digest();
         ticketsService.setTicketsPromise();
+        ticketsService.setTicketSubmitPromise();
+        ticketsService.setReplySubmitPromise();
       });
   }
 }

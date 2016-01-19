@@ -77,6 +77,8 @@ var LatestTicketsDirectiveController = (function () {
             $scope.title = _this.title;
             $scope.$digest();
             ticketsService.setTicketsPromise();
+            ticketsService.setTicketSubmitPromise();
+            ticketsService.setReplySubmitPromise();
         });
     }
     return LatestTicketsDirectiveController;
@@ -184,7 +186,7 @@ function SearchDirectiveFactory() {
     return {
         restrict: 'E',
         scope: {},
-        template: '<div class="label">Search For A Ticket</div>' +
+        template: '<h3>Search For A Ticket</h3>' +
             '<input type="text" placeholder="Search for tickets" class="input" ng-keydown="ctrl.checkKeyDown($event)" ng-keyup="ctrl.checkKeyUp($event)" ng-model="ctrl.searchText" ng-change="ctrl.search()"/>' +
             '<ul class="suggestions-list">' +
             '<li ng-repeat="suggestion in ctrl.suggestions track by $index" ng-class="suggestion" ng-click="ctrl.goToTicketView($index)"><a ui-sref="ticket({ticketId: suggestion.getTicketId()})">{{suggestion.getTicketTitle()}}</a></li>' +
@@ -199,16 +201,22 @@ exports["default"] = SearchDirectiveFactory;
 },{}],5:[function(require,module,exports){
 var TicketSubmitDirectiveController = (function () {
     /* @ngInject */
-    function TicketSubmitDirectiveController(ticketsService) {
+    function TicketSubmitDirectiveController(ticketsService, $state) {
         this.ticketsService = ticketsService;
+        this.$state = $state;
         this.newTicket = {};
         this.isSubmitted = false;
     }
     ;
     TicketSubmitDirectiveController.prototype.submitNewTicket = function (isValid) {
+        var _this = this;
         this.isSubmitted = true;
         this.ticketsService.postNewTicketToServer(this.newTicket);
         //maybe should clear the newTicket field
+        this.ticketsService.getTicketSubmitPromise()
+            .then(function () {
+            _this.$state.go('home');
+        });
     };
     return TicketSubmitDirectiveController;
 })();
@@ -216,7 +224,7 @@ function TicketSubmitDirectiveFactory() {
     return {
         restrict: 'E',
         scope: {},
-        template: '<h3>Add a new Ticket:</h3>' +
+        template: '<h3>Add a new Ticket</h3>' +
             '<form name="submitTicketForm" class="form" ng-submit="ctrl.submitNewTicket(submitTicketForm.$valid)" novalidate>' +
             '<div class="form-group">' +
             '<label>Title</label>' +
@@ -278,17 +286,23 @@ exports["default"] = RepliesDirectiveFactory;
 },{}],7:[function(require,module,exports){
 var ReplySubmitDirectiveController = (function () {
     /* @ngInject */
-    function ReplySubmitDirectiveController(ticketsService, $scope) {
+    function ReplySubmitDirectiveController(ticketsService, $state) {
         this.ticketsService = ticketsService;
+        this.$state = $state;
         this.newReply = {};
         this.isSubmitted = false;
     }
     ;
     ReplySubmitDirectiveController.prototype.submitNewReply = function (isValid, id) {
+        var _this = this;
         console.log('id: ', id);
         this.isSubmitted = true;
         this.ticketsService.postNewReplyToServer(id, this.newReply);
         //maybe should clear the newReply field
+        this.ticketsService.getReplySubmitPromise()
+            .then(function () {
+            _this.$state.go('home');
+        });
     };
     return ReplySubmitDirectiveController;
 })();
@@ -443,6 +457,8 @@ var TicketsService = (function () {
     function TicketsService($http) {
         this.$http = $http;
         this.ticketsPromise = Q.defer();
+        this.ticketSubmitPromise = Q.defer();
+        this.replySubmitPromise = Q.defer();
         this.greetingsMessage = 'default';
     }
     TicketsService.prototype.getGlobalTicketsList = function () {
@@ -470,16 +486,30 @@ var TicketsService = (function () {
     TicketsService.prototype.postNewTicketToServer = function (newTicket) {
         console.log('sending a new ticket to the server: ', JSON.stringify(newTicket));
         this.$http.post('http://localhost:3000/tickets', JSON.stringify(newTicket));
+        this.ticketSubmitPromise.resolve();
     };
     TicketsService.prototype.postNewReplyToServer = function (ticketId, newReply) {
         console.log('sending a new reply to the server: ', JSON.stringify(newReply));
         this.$http.post('http://localhost:3000/tickets/' + ticketId + '/replies', JSON.stringify(newReply));
+        this.replySubmitPromise.resolve();
     };
     TicketsService.prototype.getTicketsPromise = function () {
         return this.ticketsPromise.promise;
     };
     TicketsService.prototype.setTicketsPromise = function () {
         this.ticketsPromise = Q.defer();
+    };
+    TicketsService.prototype.getTicketSubmitPromise = function () {
+        return this.ticketSubmitPromise.promise;
+    };
+    TicketsService.prototype.setTicketSubmitPromise = function () {
+        this.ticketSubmitPromise = Q.defer();
+    };
+    TicketsService.prototype.getReplySubmitPromise = function () {
+        return this.replySubmitPromise.promise;
+    };
+    TicketsService.prototype.setReplySubmitPromise = function () {
+        this.replySubmitPromise = Q.defer();
     };
     return TicketsService;
 })();

@@ -8,6 +8,8 @@ class TicketsService {
   greetingsMessage: string;
   globalTicketList: TicketList;
   ticketsPromise = Q.defer();
+  ticketSubmitPromise = Q.defer();
+  replySubmitPromise = Q.defer();
 
   constructor(private $http: ng.IHttpService) {
     this.greetingsMessage = 'default';
@@ -42,11 +44,13 @@ class TicketsService {
   postNewTicketToServer(newTicket: {}): void {
     console.log('sending a new ticket to the server: ', JSON.stringify(newTicket));
     this.$http.post('http://localhost:3000/tickets', JSON.stringify(newTicket));
+    this.ticketSubmitPromise.resolve();
   }
 
   postNewReplyToServer(ticketId: string, newReply: {}): void {
     console.log('sending a new reply to the server: ', JSON.stringify(newReply));
     this.$http.post('http://localhost:3000/tickets/' + ticketId + '/replies', JSON.stringify(newReply));
+    this.replySubmitPromise.resolve();
   }
 
   getTicketsPromise() {
@@ -55,6 +59,22 @@ class TicketsService {
 
   setTicketsPromise() {
       this.ticketsPromise = Q.defer();
+  }
+
+  getTicketSubmitPromise() {
+      return this.ticketSubmitPromise.promise;
+  }
+
+  setTicketSubmitPromise() {
+      this.ticketSubmitPromise = Q.defer();
+  }
+
+  getReplySubmitPromise() {
+      return this.replySubmitPromise.promise;
+  }
+
+  setReplySubmitPromise() {
+      this.replySubmitPromise = Q.defer();
   }
 }
 

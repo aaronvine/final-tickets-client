@@ -8,14 +8,10 @@ describe('latest-tickets directive', function () {
   beforeEach(function() {
     angular.mock.module('tickets');
   });
-  fit('should render the title based on the given title', inject (function (ticketsService: TicketsService) {
-    // let testsPromise =   ticketsService.getTestsPromise();
+  it('should render the title based on the given title', inject (function (ticketsService: TicketsService) {
     let items = TicketList.generateRandomTicketList();
     let length = items.getTicketList().length;
-    // let deferred = Q.defer();
-    // let promise = deferred.promise;
-    spyOn(ticketsService, 'getTicketsPromise').and.returnValue(Q(resolve => resolve('resolved promise')));
-    // deferred.resolve('tickets get request has been resolved!');
+    spyOn(ticketsService, 'getTicketsPromise').and.returnValue(Q.defer().resolve('fake resolve..'));
     console.log('buliding driver');
     let latestTicketsDriver = LatestTicketsDriver.build(items);
     expect(latestTicketsDriver.getLatestTicketsTitle()).toBe('testing latest tickets');
@@ -27,10 +23,10 @@ describe('latest-tickets directive', function () {
     expect(latestTicketsDriver.getTicketListLength()).toBe(length);
     expect(latestTicketsDriver.getTicketTitleAt(2)).toEqual(items);
   });
-  it('should show the ticket view once a ticket is clicked', function () {
+  it('should show the ticket view once a ticket is clicked', inject (function ($state: any) {
     let items = TicketList.generateRandomTicketList();
     let latestTicketsDriver = LatestTicketsDriver.build(items);
     latestTicketsDriver.clickOnTicketAt(0);
-    //TODO
-  });
+    expect($state.current.name).toBe('ticket');
+  }));
 });
