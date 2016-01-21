@@ -1,7 +1,5 @@
 /// <reference path='../../typings/tsd.d.ts'/>
-import TicketList from '../common/ticketList';
 import Ticket from '../common/ticket';
-import TicketsService from '../tickets.srv';
 
 export default class TicketViewDriver {
 
@@ -13,19 +11,19 @@ export default class TicketViewDriver {
     this.scope = scope;
   }
 
-  static build(item: Ticket): TicketViewDriver {
+  static build(ticket: Ticket): TicketViewDriver {
     let elem, scope : any;
-    inject(($rootScope, $compile, ticketsService: TicketsService) => {
+    inject(($rootScope, $compile) => {
       scope = $rootScope.$new();
-      scope.item = item;
-      elem = $compile('<ticket-view ticket="item"></ticket-view>')(scope);
+      scope.ticket = ticket;
+      elem = $compile('<ticket-view ticket="ticket"></ticket-view>')(scope);
       scope.$digest();
     });
     return new TicketViewDriver(elem, scope);
   }
 
   getEmail(): string {
-    return this.elem.find('h3').text().split(' ')[1];
+    return this.elem.find('h3').eq(0).text().split(' ')[1];
   }
 
   getRepliesDrv(): any {
@@ -34,6 +32,14 @@ export default class TicketViewDriver {
 
   getReplySubmitDrv(): any {
     return this.elem.find('reply-submit');
+  }
+
+  getTicketTitle(): string {
+    return this.elem.find('.ticket-title').text();
+  }
+
+  getTicketContent(): string {
+    return this.elem.find('.ticket-content').text();
   }
 
 }

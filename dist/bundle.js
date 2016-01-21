@@ -1,4 +1,21 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var Reply = (function () {
+    function Reply(content, userEmail) {
+        this.content = content;
+        this.userEmail = userEmail;
+    }
+    Reply.prototype.getReplyContent = function () {
+        return this.content;
+    };
+    Reply.prototype.getReplyUserEmail = function () {
+        return this.userEmail;
+    };
+    return Reply;
+})();
+exports.__esModule = true;
+exports["default"] = Reply;
+
+},{}],2:[function(require,module,exports){
 var Ticket = (function () {
     function Ticket(id, title, content, userEmail, replies) {
         this.id = id;
@@ -22,122 +39,71 @@ var Ticket = (function () {
     Ticket.prototype.getTicketReplies = function () {
         return this.replies;
     };
+    Ticket.prototype.updateReplies = function (replies) {
+        this.replies = replies;
+    };
     return Ticket;
 })();
 exports.__esModule = true;
 exports["default"] = Ticket;
 
-},{}],2:[function(require,module,exports){
-var ticket_1 = require('./ticket');
-var TicketList = (function () {
-    function TicketList(myTicketList) {
-        this.myTicketList = myTicketList;
-    }
-    TicketList.prototype.getTicketList = function () {
-        return this.myTicketList;
-    };
-    TicketList.prototype.addNewTicket = function (newTicket) {
-        this.myTicketList.push(newTicket);
-    };
-    TicketList.prototype.updateTicketList = function (updatedTicketList) {
-        this.myTicketList = updatedTicketList;
-    };
-    TicketList.uuid = function () {
-        return Math.floor(Math.random() * 999999).toString(36);
-    };
-    TicketList.generateRandomTicketList = function () {
-        var t1 = new ticket_1["default"](this.uuid(), 'Hello', 'I have a problem', 'bob@bobcorp.com', []);
-        var t2 = new ticket_1["default"](this.uuid(), 'Problem with domain', 'It is not working', 'alice@alicecorp.com', []);
-        var t3 = new ticket_1["default"](this.uuid(), 'Help me again', 'My site is broken', 'bob@bobcorp.com', []);
-        return new TicketList([t1, t2, t3]);
-    };
-    return TicketList;
-})();
-exports.__esModule = true;
-exports["default"] = TicketList;
-
-},{"./ticket":1}],3:[function(require,module,exports){
-var ticketList_1 = require('../common/ticketList');
+},{}],3:[function(require,module,exports){
 var LatestTicketsDirectiveController = (function () {
     /* @ngInject */
-    function LatestTicketsDirectiveController($parse, $element, $scope, ticketsService) {
-        var _this = this;
+    function LatestTicketsDirectiveController(ticketsService) {
         this.itemsLimit = 5;
         this.title = 'Latest Tickets';
-        console.log('builiding the latest-tickets controller, waiting for the promise to be resolved');
-        ticketsService.getTicketsPromise()
-            .then(function (message) {
-            console.log(message);
-            var tempItemsList = $parse($element.attr('ng-model'))($scope.$parent).getTicketList();
-            var myItemsList = $.extend(true, [], tempItemsList);
-            _this.items = new ticketList_1["default"](myItemsList);
-            console.log('items: ', _this.items);
-            _this.items.updateTicketList(_this.items.getTicketList().splice(_this.items.getTicketList().length - _this.itemsLimit, _this.itemsLimit));
-            $scope.items = _this.items;
-            $scope.title = _this.title;
-            $scope.$digest();
-            ticketsService.setTicketsPromise();
-            ticketsService.setTicketSubmitPromise();
-            ticketsService.setReplySubmitPromise();
-        });
+        var tempTicketsList = this.tickets;
+        var myTicketsList = $.extend(true, [], tempTicketsList);
+        this.tickets = myTicketsList;
+        if (this.tickets.length > 5) {
+            this.tickets = this.tickets.splice(this.tickets.length - this.itemsLimit, this.itemsLimit);
+        }
+        console.log('LatestTicketsDirectiveController.tickets: ', this.tickets);
     }
     return LatestTicketsDirectiveController;
 })();
 function LatestTicketsDirectiveFactory() {
     return {
         restrict: 'E',
-        require: 'ngModel',
-        scope: {},
-        link: function (scope, element, attr, ngModelController) {
-            scope.ngModelController = ngModelController;
+        scope: {
+            tickets: '='
         },
-        template: '<h3>{{title}}</h3>' +
+        template: '<h3>{{ctrl.title}}</h3>' +
             '<ul class="latest-tickets-list">' +
-            '<li class="ticket" ng-repeat="ticket in items.getTicketList()"><a ui-sref="ticket({ticketId: ticket.getTicketId()})"><b>{{ticket.getTicketTitle()}}</b></a><br><pre>{{ticket.getTicketContent().split("\n")[0]}}</pre></li>' +
+            '<li class="ticket" ng-repeat="ticket in ctrl.tickets"><a ui-sref="ticket({ticketId: ticket.getTicketId()})"><label class="ticket-title">{{ticket.getTicketTitle()}}</label></a><br><pre class="ticket-content">{{ticket.getTicketContent().split("\n")[0]}}</pre></li>' +
             '</ul>',
-        controller: LatestTicketsDirectiveController
+        controller: LatestTicketsDirectiveController,
+        controllerAs: 'ctrl',
+        bindToController: true
     };
 }
 exports.__esModule = true;
 exports["default"] = LatestTicketsDirectiveFactory;
 
-},{"../common/ticketList":2}],4:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 var SearchDirectiveController = (function () {
     /* @ngInject */
-    function SearchDirectiveController(ticketsService, $scope, $rootScope) {
-        var _this = this;
+    function SearchDirectiveController(ticketsService) {
         this.ticketsService = ticketsService;
-        this.$rootScope = $rootScope;
-        console.log('builiding the search controller, waiting for the promise to be resolved');
-        ticketsService.getTicketsPromise()
-            .then(function (message) {
-            console.log(message);
-            // this.searchItmes = ticketsService.getGlobalTicketsList().getTicketList().map(function (ticket) {
-            //   return {
-            //             id: ticket.getTicketId(),
-            //             title: ticket.getTicketTitle()
-            //         };
-            // });
-            _this.searchItmes = ticketsService.getGlobalTicketsList().getTicketList();
-            console.log('searchItems: ', _this.searchItmes);
-            _this.suggestions = [];
-            _this.selectedIndex = -1;
-        });
+        this.title = 'Search For A Ticket';
+        this.searchItmes = this.tickets;
+        console.log('SearchDirectiveController.searchItems: ', this.searchItmes);
+        this.suggestions = [];
+        this.selectedIndex = -1;
     }
     ;
     // invoke on ng-change
     SearchDirectiveController.prototype.search = function () {
-        console.log('invoked search function!!!');
+        console.log('SearchDirectiveController invoked search function!!!');
         this.suggestions = [];
         var myMaxSuggestionListLength = 0;
         var that = this;
         this.searchItmes.every(function (item) {
             var searchItemsLowercase = angular.lowercase(item.getTicketTitle());
-            console.log('searchItemsLowercase: ', searchItemsLowercase);
             var searchTextLowercase = angular.lowercase(that.searchText);
-            console.log('searchTextLowercase: ', searchTextLowercase);
             if (searchItemsLowercase.indexOf(searchTextLowercase) > -1) {
-                console.log('found a match: ', searchTextLowercase);
+                console.log('SearchDirectiveController found a match: ', searchTextLowercase);
                 that.suggestions.push(item);
                 myMaxSuggestionListLength += 1;
                 if (myMaxSuggestionListLength === 3) {
@@ -185,14 +151,17 @@ var SearchDirectiveController = (function () {
 function SearchDirectiveFactory() {
     return {
         restrict: 'E',
-        scope: {},
-        template: '<h3>Search For A Ticket</h3>' +
+        scope: {
+            tickets: '='
+        },
+        template: '<h3>{{ctrl.title}}</h3>' +
             '<input type="text" placeholder="Search for tickets" class="input" ng-keydown="ctrl.checkKeyDown($event)" ng-keyup="ctrl.checkKeyUp($event)" ng-model="ctrl.searchText" ng-change="ctrl.search()"/>' +
             '<ul class="suggestions-list">' +
             '<li ng-repeat="suggestion in ctrl.suggestions track by $index" ng-class="suggestion" ng-click="ctrl.goToTicketView($index)"><a ui-sref="ticket({ticketId: suggestion.getTicketId()})">{{suggestion.getTicketTitle()}}</a></li>' +
             '</ul>',
         controller: SearchDirectiveController,
-        controllerAs: 'ctrl'
+        controllerAs: 'ctrl',
+        bindToController: true
     };
 }
 exports.__esModule = true;
@@ -204,6 +173,7 @@ var TicketSubmitDirectiveController = (function () {
     function TicketSubmitDirectiveController(ticketsService, $state) {
         this.ticketsService = ticketsService;
         this.$state = $state;
+        this.title = 'Add a new Ticket';
         this.newTicket = {};
         this.isSubmitted = false;
     }
@@ -212,7 +182,6 @@ var TicketSubmitDirectiveController = (function () {
         var _this = this;
         this.isSubmitted = true;
         this.ticketsService.postNewTicketToServer(this.newTicket);
-        //maybe should clear the newTicket field
         this.ticketsService.getTicketSubmitPromise()
             .then(function () {
             _this.$state.go('home');
@@ -224,7 +193,7 @@ function TicketSubmitDirectiveFactory() {
     return {
         restrict: 'E',
         scope: {},
-        template: '<h3>Add a new Ticket</h3>' +
+        template: '<h3>{{ctrl.title}}</h3>' +
             '<form name="submitTicketForm" class="form" ng-submit="ctrl.submitNewTicket(submitTicketForm.$valid)" novalidate>' +
             '<div class="form-group">' +
             '<label>Title</label>' +
@@ -256,28 +225,25 @@ exports["default"] = TicketSubmitDirectiveFactory;
 },{}],6:[function(require,module,exports){
 var RepliesDirectiveController = (function () {
     /* @ngInject */
-    function RepliesDirectiveController($parse, $element, $scope, ticketsService) {
+    function RepliesDirectiveController() {
         this.title = 'Replies';
-        var repliesList = $parse($element.attr('ng-model'))($scope.$parent);
-        this.items = repliesList;
-        console.log('items (replies): ', this.items);
+        console.log('RepliesDirectiveController.ticketReplies: ', this.replies);
     }
     return RepliesDirectiveController;
 })();
 function RepliesDirectiveFactory() {
     return {
         restrict: 'E',
-        require: 'ngModel',
-        scope: {},
-        link: function (scope, element, attr, ngModelController) {
-            scope.ngModelController = ngModelController;
+        scope: {
+            replies: '='
         },
         template: '<h3>{{ctrl.title}}</h3>' +
             '<ul class="replies-list">' +
-            '<li class="reply" ng-repeat="reply in ctrl.items"><pre>{{reply.content}}<br>from: {{reply.userEmail}}</pre></li>' +
+            '<li class="reply" ng-repeat="reply in ctrl.replies"><pre class="reply-content">{{reply.getReplyContent()}}</pre><pre class="reply-user-email">from: {{reply.getReplyUserEmail()}}</pre></li>' +
             '</ul>',
         controller: RepliesDirectiveController,
-        controllerAs: 'ctrl'
+        controllerAs: 'ctrl',
+        bindToController: true
     };
 }
 exports.__esModule = true;
@@ -289,6 +255,7 @@ var ReplySubmitDirectiveController = (function () {
     function ReplySubmitDirectiveController(ticketsService, $state) {
         this.ticketsService = ticketsService;
         this.$state = $state;
+        this.title = 'Add a new Reply';
         this.newReply = {};
         this.isSubmitted = false;
     }
@@ -298,10 +265,9 @@ var ReplySubmitDirectiveController = (function () {
         console.log('id: ', id);
         this.isSubmitted = true;
         this.ticketsService.postNewReplyToServer(id, this.newReply);
-        //maybe should clear the newReply field
         this.ticketsService.getReplySubmitPromise()
             .then(function () {
-            _this.$state.go('home');
+            _this.$state.go('ticket', { ticketId: id }, { reload: true });
         });
     };
     return ReplySubmitDirectiveController;
@@ -312,7 +278,7 @@ function ReplySubmitDirectiveFactory() {
         scope: {
             id: '@'
         },
-        template: '<h3>Add a new Reply:</h3>' +
+        template: '<h3>{{ctrl.title}}</h3>' +
             '<form name="submitReplyForm" class="form" ng-submit="ctrl.submitNewReply(submitReplyForm.$valid, id)" novalidate>' +
             '<div class="form-group">' +
             '<label>Email address</label>' +
@@ -339,11 +305,11 @@ exports["default"] = ReplySubmitDirectiveFactory;
 },{}],8:[function(require,module,exports){
 var TicketViewDirectiveController = (function () {
     /* @ngInject */
-    function TicketViewDirectiveController(ticketsService, $scope) {
-        this.ticket = $scope.ticket;
-        this.ticketReplies = this.ticket.getTicketReplies();
+    function TicketViewDirectiveController(ticketsService) {
         this.ticketId = this.ticket.getTicketId();
-        console.log('ticket-id(ticket view): ', this.ticketId);
+        this.replies = this.ticket.getTicketReplies();
+        console.log('TicketViewDirectiveController.ticket: ', this.ticket);
+        console.log('TicketViewDirectiveController.replies: ', this.replies);
     }
     ;
     return TicketViewDirectiveController;
@@ -354,14 +320,13 @@ function TicketViewDirectiveFactory() {
         scope: {
             ticket: '='
         },
-        template: '<h3>From: <a ui-sref="user-tickets({email: ctrl.ticket.getTicketUserEmail()})">{{ctrl.ticket.getTicketUserEmail()}}</a></h3>' +
-            '<ul class="latest-tickets-list">' +
-            '<li class="ticket" <b>{{ctrl.ticket.getTicketTitle()}}</b><br><pre>{{ctrl.ticket.getTicketContent()}}</pre></li>' +
-            '</ul>' +
-            '<replies ng-model="ctrl.ticketReplies"></replies>' +
+        template: '<h3>From: {{ctrl.ticket.getTicketUserEmail()}}</h3>' +
+            '<label class="ticket-title">{{ctrl.ticket.getTicketTitle()}}</label><br><pre class="ticket-content">{{ctrl.ticket.getTicketContent()}}</pre>' +
+            '<replies replies="ctrl.replies"></replies>' +
             '<reply-submit id="{{ctrl.ticketId}}"></reply-submit>',
         controller: TicketViewDirectiveController,
-        controllerAs: 'ctrl'
+        controllerAs: 'ctrl',
+        bindToController: true
     };
 }
 exports.__esModule = true;
@@ -375,20 +340,21 @@ function ticketsRoutingConfig($stateProvider, $urlRouterProvider) {
         .state('home', {
         url: '/',
         template: '<h1>{{ctrl.greetings}}</h1>' +
-            '<search></search>' +
-            '<latest-tickets ng-model=ctrl.tickets></latest-tickets>' +
+            '<search tickets="ctrl.tickets"></search>' +
+            '<latest-tickets tickets="ctrl.tickets"></latest-tickets>' +
             '<a ui-sref="submit"><b>Submit a new ticket</b></a>',
-        controller: function (ticketsService, $scope) {
-            var _this = this;
-            ticketsService.getGreetingsMessage()
-                .then(function (data) {
-                _this.greetings = data;
-            });
-            ticketsService.getTicketsFromServer()
-                .then(function (data) {
-                _this.tickets = ticketsService.buildTicketsListFromJson(data);
-                ticketsService.ticketsPromise.resolve('tickets get request has been resolved!');
-            });
+        resolve: {
+            tickets: function (ticketsService) {
+                return ticketsService.getTicketsFromServer()
+                    .then(function (res) { return (ticketsService.buildTicketsListFromJson(res)); });
+            },
+            greetingMessage: function (ticketsService) {
+                return ticketsService.getGreetingsMessage();
+            }
+        },
+        controller: function (tickets, greetingMessage) {
+            this.greeting = greetingMessage;
+            this.tickets = tickets;
         },
         controllerAs: 'ctrl'
     })
@@ -396,21 +362,19 @@ function ticketsRoutingConfig($stateProvider, $urlRouterProvider) {
         url: '/ticket/:ticketId',
         resolve: {
             ticket: function ($stateParams, ticketsService, $state) {
-                try {
-                    return ticketsService.globalTicketList.getTicketList().filter(function (ticket) {
-                        return ticket.getTicketId() === $stateParams.ticketId;
-                    })[0];
-                }
-                catch (e) {
-                    console.error(e);
-                    $state.go('404');
-                }
+                return ticketsService.globalTicketList.filter(function (ticket) {
+                    return ticket.getTicketId() === $stateParams.ticketId;
+                })[0];
+            },
+            replies: function ($stateParams, ticketsService) {
+                return ticketsService.getRepliesFromServer($stateParams.ticketId)
+                    .then(function (res) { return (ticketsService.buildRepliesListFromJson(res)); });
             }
         },
-        template: '<ticket-view ticket="ctrl.item"></ticket-view>',
-        controller: function (ticket) {
-            console.log('UI ROUTE: TICKET: ', ticket);
-            this.item = ticket;
+        template: '<ticket-view ticket="ctrl.ticket"></ticket-view>',
+        controller: function (ticket, replies) {
+            this.ticket = ticket;
+            this.ticket.updateReplies(replies);
         },
         controllerAs: 'ctrl'
     })
@@ -452,11 +416,10 @@ angular.module('tickets', ['ui.router'])
 },{"./latest-tickets/latest-tickets.drv":3,"./search/search.drv":4,"./ticket-submit/ticket-submit.drv":5,"./ticket-view/replies/replies.drv":6,"./ticket-view/reply-submit/reply-submit.drv":7,"./ticket-view/ticket-view.drv":8,"./tickets-routing.config":9,"./tickets.srv":11}],11:[function(require,module,exports){
 /// <reference path='../typings/tsd.d.ts' />
 var ticket_1 = require('./common/ticket');
-var ticketList_1 = require('././common/ticketList');
+var reply_1 = require('./common/reply');
 var TicketsService = (function () {
     function TicketsService($http) {
         this.$http = $http;
-        this.ticketsPromise = Q.defer();
         this.ticketSubmitPromise = Q.defer();
         this.replySubmitPromise = Q.defer();
         this.greetingsMessage = 'default';
@@ -465,39 +428,47 @@ var TicketsService = (function () {
         return this.globalTicketList;
     };
     TicketsService.prototype.getGreetingsMessage = function () {
-        console.log('getting message from server');
+        console.log('TicketsService is getting greetings message from server');
         return this.$http.get('http://localhost:3000/test')
             .then(function (res) { return res.data; });
     };
     TicketsService.prototype.getTicketsFromServer = function () {
-        console.log('getting tickets from server');
+        console.log('TicketsService is getting tickets from server');
         return this.$http.get('http://localhost:3000/tickets')
             .then(function (res) { return res.data; });
     };
+    TicketsService.prototype.buildRepliesListFromJson = function (json) {
+        console.log('TicketsService is building replies json: ', JSON.stringify(json));
+        var numOfReplies = Object.keys(json).length;
+        var repliesList = Array.apply(null, Array(numOfReplies)).map(function (item, index) {
+            return new reply_1["default"](json[index].content, json[index].userEmail);
+        });
+        console.log('TicketsService built the replies list: ', repliesList);
+        return repliesList;
+    };
     TicketsService.prototype.buildTicketsListFromJson = function (json) {
-        console.log('building json: ', JSON.stringify(json));
+        console.log('TicketsService is building ticket json: ', JSON.stringify(json));
         var numOfTickets = Object.keys(json).length;
-        this.globalTicketList = new ticketList_1["default"](Array.apply(null, Array(numOfTickets)).map(function (item, index) {
+        this.globalTicketList = Array.apply(null, Array(numOfTickets)).map(function (item, index) {
             return new ticket_1["default"](json[index].id, json[index].title, json[index].content, json[index].userEmail, json[index].replies);
-        }));
-        console.log('built TicketList: ', this.globalTicketList);
+        });
+        console.log('TicketsService built the tickets list: ', this.globalTicketList);
         return this.globalTicketList;
     };
+    TicketsService.prototype.getRepliesFromServer = function (ticketId) {
+        console.log('TicketsService is getting replies from server');
+        return this.$http.get('http://localhost:3000/tickets/' + ticketId + '/replies')
+            .then(function (res) { return res.data; });
+    };
     TicketsService.prototype.postNewTicketToServer = function (newTicket) {
-        console.log('sending a new ticket to the server: ', JSON.stringify(newTicket));
+        console.log('TicketsService is sending a new ticket to the server: ', JSON.stringify(newTicket));
         this.$http.post('http://localhost:3000/tickets', JSON.stringify(newTicket));
         this.ticketSubmitPromise.resolve();
     };
     TicketsService.prototype.postNewReplyToServer = function (ticketId, newReply) {
-        console.log('sending a new reply to the server: ', JSON.stringify(newReply));
+        console.log('TicketsService is sending a new reply to the server: ', JSON.stringify(newReply));
         this.$http.post('http://localhost:3000/tickets/' + ticketId + '/replies', JSON.stringify(newReply));
         this.replySubmitPromise.resolve();
-    };
-    TicketsService.prototype.getTicketsPromise = function () {
-        return this.ticketsPromise.promise;
-    };
-    TicketsService.prototype.setTicketsPromise = function () {
-        this.ticketsPromise = Q.defer();
     };
     TicketsService.prototype.getTicketSubmitPromise = function () {
         return this.ticketSubmitPromise.promise;
@@ -516,4 +487,4 @@ var TicketsService = (function () {
 exports.__esModule = true;
 exports["default"] = TicketsService;
 
-},{"././common/ticketList":2,"./common/ticket":1}]},{},[10]);
+},{"./common/reply":1,"./common/ticket":2}]},{},[10]);

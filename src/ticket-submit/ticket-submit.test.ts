@@ -1,7 +1,4 @@
-import TicketList from '../common/ticketList';
-import Ticket from '../common/ticket';
 import TicketSubmitDriver from './ticket-submit-driver';
-import TicketsService from '../tickets.srv';
 
 describe('ticket-submit directive', function () {
 
@@ -28,6 +25,16 @@ describe('ticket-submit directive', function () {
   it('should contain a submit button', function () {
     let ticketSubmitDriver = TicketSubmitDriver.build();
     expect(ticketSubmitDriver.getButton().length).toBeGreaterThan(0);
+  });
+
+  it('should show a warning if the title field is empty', function () {
+    let ticketSubmitDriver = TicketSubmitDriver.build();
+    expect(ticketSubmitDriver.getTitleWarning()).toBe('Title is required.');
+  });
+
+  it('should show a warning if the email is incorrect', function () {
+    let ticketSubmitDriver = TicketSubmitDriver.build();
+    expect(ticketSubmitDriver.getUserEmailWarning()).toBe('Enter a valid email address.');
   });
 
 });

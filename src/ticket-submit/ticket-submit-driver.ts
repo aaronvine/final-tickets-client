@@ -1,6 +1,4 @@
 /// <reference path='../../typings/tsd.d.ts'/>
-import TicketList from '../common/ticketList';
-import TicketsService from '../tickets.srv';
 
 export default class TicketSubmitDriver {
 
@@ -14,7 +12,7 @@ export default class TicketSubmitDriver {
 
   static build(): TicketSubmitDriver {
     let elem, scope : any;
-    inject(($rootScope, $compile, ticketsService: TicketsService) => {
+    inject(($rootScope, $compile) => {
       scope = $rootScope.$new();
       elem = $compile('<ticket-submit></ticket-submit>')(scope);
       scope.$digest();
@@ -40,6 +38,14 @@ export default class TicketSubmitDriver {
 
   getButton(): any {
     return this.elem.find('button');
+  }
+
+  getTitleWarning(): any {
+    return this.elem.find('.help-block').eq(0).text();
+  }
+
+  getUserEmailWarning(): any {
+    return this.elem.find('.help-block').eq(1).text();
   }
 
 }

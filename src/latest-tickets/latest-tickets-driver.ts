@@ -1,6 +1,5 @@
 /// <reference path='../../typings/tsd.d.ts'/>
-import TicketList from '../common/ticketList';
-import TicketsService from '../tickets.srv';
+import Ticket from '../common/ticket';
 
 export default class LatestTicketsDriver {
 
@@ -12,13 +11,12 @@ export default class LatestTicketsDriver {
     this.scope = scope;
   }
 
-  static build(items: TicketList): LatestTicketsDriver {
+  static build(tickets: Ticket[]): LatestTicketsDriver {
     let elem, scope : any;
-    inject(($rootScope, $compile, ticketsService: TicketsService) => {
+    inject(($rootScope, $compile) => {
       scope = $rootScope.$new();
-      scope.title = 'testing latest tickets';
-      scope.items = items;
-      elem = $compile('<latest-tickets ng-model="items"></latest-tickets>')(scope);
+      scope.tickets = tickets;
+      elem = $compile('<latest-tickets tickets="tickets"></latest-tickets>')(scope);
       scope.$digest();
     });
     return new LatestTicketsDriver(elem, scope);
@@ -36,7 +34,8 @@ export default class LatestTicketsDriver {
     return this.elem.find('.ticket-title').eq(i).text();
   }
 
-  clickOnTicketAt(i): void {
-    this.elem.find('.ticket').eq(i).triggerHandler('click');
-  };
+  getTicketContentAt(i): string {
+    return this.elem.find('.ticket-content').eq(i).text();
+  }
+
 }

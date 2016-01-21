@@ -1,5 +1,5 @@
 import TicketsService from './tickets.srv';
-import TicketList from './common/ticketList';
+import Reply from './common/reply';
 import Ticket from './common/ticket';
 
 /*@ngInject*/
@@ -9,19 +9,21 @@ export default function ticketsRoutingConfig($stateProvider: ng.ui.IStateProvide
       .state('home', {
         url: '/',
         template: '<h1>{{ctrl.greetings}}</h1>' +
-                  '<search></search>' +
-                  '<latest-tickets ng-model=ctrl.tickets></latest-tickets>' +
+                  '<search tickets="ctrl.tickets"></search>' +
+                  '<latest-tickets tickets="ctrl.tickets"></latest-tickets>' +
                   '<a ui-sref="submit"><b>Submit a new ticket</b></a>',
-        controller: function (ticketsService: TicketsService, $scope: any) {
-          ticketsService.getGreetingsMessage()
-            .then((data) => {
-              this.greetings = data;
-            });
-          ticketsService.getTicketsFromServer()
-            .then((data) => {
-              this.tickets = ticketsService.buildTicketsListFromJson(data);
-              ticketsService.ticketsPromise.resolve('tickets get request has been resolved!');
-            });
+        resolve: {
+          tickets: function (ticketsService: TicketsService) {
+            return ticketsService.getTicketsFromServer()
+              .then((res) => (ticketsService.buildTicketsListFromJson(res)));
+          },
+          greetingMessage: function (ticketsService: TicketsService) {
+            return ticketsService.getGreetingsMessage();
+          }
+        },
+        controller: function (tickets: Ticket[], greetingMessage) {
+          this.greeting = greetingMessage;
+          this.tickets = tickets;
         },
         controllerAs: 'ctrl'
       })
@@ -29,20 +31,19 @@ export default function ticketsRoutingConfig($stateProvider: ng.ui.IStateProvide
         url: '/ticket/:ticketId',
         resolve: {
             ticket: function ($stateParams, ticketsService: TicketsService, $state) {
-                try {
-                    return ticketsService.globalTicketList.getTicketList().filter(function (ticket) {
-                      return ticket.getTicketId() === $stateParams.ticketId;
-                    })[0];
-                } catch (e) {
-                  console.error(e);
-                  $state.go('404');
-                }
+              return ticketsService.globalTicketList.filter(function (ticket) {
+                return ticket.getTicketId() === $stateParams.ticketId;
+              })[0];
+            },
+            replies: function ($stateParams, ticketsService: TicketsService) {
+              return ticketsService.getRepliesFromServer($stateParams.ticketId)
+                .then((res) => (ticketsService.buildRepliesListFromJson(res)));
             }
         },
-        template: '<ticket-view ticket="ctrl.item"></ticket-view>',
-        controller: function (ticket: Ticket) {
-          console.log('UI ROUTE: TICKET: ', ticket);
-          this.item = ticket;
+        template: '<ticket-view ticket="ctrl.ticket"></ticket-view>',
+        controller: function (ticket: Ticket, replies: Reply[]) {
+          this.ticket = ticket;
+          this.ticket.updateReplies(replies);
         },
         controllerAs: 'ctrl'
       })

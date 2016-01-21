@@ -1,3 +1,4 @@
+import Reply from './reply';
 
 class Ticket {
 
@@ -5,9 +6,9 @@ class Ticket {
   title: string;
   content: string;
   userEmail: string;
-  replies: {}[];
+  replies: Reply[];
 
-  constructor(id: string, title: string, content: string, userEmail: string, replies: {}[]) {
+  constructor(id: string, title: string, content: string, userEmail: string, replies: Reply[]) {
     this.id = id;
     this.title = title;
     this.content = content;
@@ -31,8 +32,12 @@ class Ticket {
     return this.userEmail;
   }
 
-  getTicketReplies(): {}[] {
+  getTicketReplies(): Reply[] {
     return this.replies;
+  }
+
+  updateReplies(replies) {
+    this.replies = replies;
   }
 
 }

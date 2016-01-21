@@ -1,10 +1,12 @@
 import TicketsService from '../tickets.srv';
-import TicketList from '../common/ticketList';
+import Reply from '../common/reply';
 import Ticket from '../common/ticket';
 
 class TicketSubmitDirectiveController {
   newTicket: {};
   isSubmitted: boolean;
+  title = 'Add a new Ticket';
+
   /* @ngInject */
   constructor(private ticketsService: TicketsService, private $state: any) {
     this.newTicket = {};
@@ -14,7 +16,6 @@ class TicketSubmitDirectiveController {
   submitNewTicket(isValid: boolean): void {
     this.isSubmitted = true;
     this.ticketsService.postNewTicketToServer(this.newTicket);
-    //maybe should clear the newTicket field
     this.ticketsService.getTicketSubmitPromise()
     .then(() => {
       this.$state.go('home');
@@ -27,7 +28,7 @@ export default function TicketSubmitDirectiveFactory(): ng.IDirective {
     restrict: 'E',
     scope: {
     },
-    template: '<h3>Add a new Ticket</h3>' +
+    template: '<h3>{{ctrl.title}}</h3>' +
               '<form name="submitTicketForm" class="form" ng-submit="ctrl.submitNewTicket(submitTicketForm.$valid)" novalidate>' +
                 '<div class="form-group">' +
                   '<label>Title</label>' +

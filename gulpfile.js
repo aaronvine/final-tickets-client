@@ -62,7 +62,7 @@ gulp.task('e2e', function () {
 });
 
 gulp.task('watch', function () {
-    gulp.watch('./src/**/*.ts', ['js']);
+    gulp.watch('./src/**/*.ts', ['js', 'build-tests']);
 });
 
 gulp.task('default', ['js', 'serve', 'watch']);

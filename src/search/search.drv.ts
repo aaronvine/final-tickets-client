@@ -1,45 +1,33 @@
 import TicketsService from '../tickets.srv';
-import TicketList from '../common/ticketList';
 import Ticket from '../common/ticket';
 
 class SearchDirectiveController {
+  tickets: Ticket[];
   searchItmes: Ticket[];
   suggestions: Ticket[];
   selectedIndex: number;
   searchText: string;
+  title = 'Search For A Ticket';
 
   /* @ngInject */
-  constructor(private ticketsService: TicketsService, $scope: any, private $rootScope: any) {
-    console.log('builiding the search controller, waiting for the promise to be resolved');
-    ticketsService.getTicketsPromise()
-    .then((message: string) => {
-      console.log(message);
-      // this.searchItmes = ticketsService.getGlobalTicketsList().getTicketList().map(function (ticket) {
-      //   return {
-      //             id: ticket.getTicketId(),
-      //             title: ticket.getTicketTitle()
-      //         };
-      // });
-      this.searchItmes = ticketsService.getGlobalTicketsList().getTicketList();
-      console.log('searchItems: ', this.searchItmes);
-      this.suggestions = [];
-      this.selectedIndex = -1;
-    });
+  constructor(private ticketsService: TicketsService) {
+    this.searchItmes = this.tickets;
+    console.log('SearchDirectiveController.searchItems: ', this.searchItmes);
+    this.suggestions = [];
+    this.selectedIndex = -1;
   };
 
   // invoke on ng-change
   search(): void {
-    console.log('invoked search function!!!');
+    console.log('SearchDirectiveController invoked search function!!!');
     this.suggestions = [];
     let myMaxSuggestionListLength = 0;
     let that = this;
     this.searchItmes.every(function (item) {
       let searchItemsLowercase = angular.lowercase(item.getTicketTitle());
-      console.log('searchItemsLowercase: ', searchItemsLowercase);
       let searchTextLowercase = angular.lowercase(that.searchText);
-      console.log('searchTextLowercase: ', searchTextLowercase);
       if (searchItemsLowercase.indexOf(searchTextLowercase) > -1) {
-        console.log('found a match: ', searchTextLowercase);
+        console.log('SearchDirectiveController found a match: ', searchTextLowercase);
         that.suggestions.push(item);
         myMaxSuggestionListLength += 1;
         if (myMaxSuggestionListLength === 3) {
@@ -88,13 +76,15 @@ export default function SearchDirectiveFactory(): ng.IDirective {
   return <ng.IDirective> {
     restrict: 'E',
     scope: {
+      tickets: '='
     },
-    template: '<h3>Search For A Ticket</h3>' +
+    template: '<h3>{{ctrl.title}}</h3>' +
               '<input type="text" placeholder="Search for tickets" class="input" ng-keydown="ctrl.checkKeyDown($event)" ng-keyup="ctrl.checkKeyUp($event)" ng-model="ctrl.searchText" ng-change="ctrl.search()"/>' +
               '<ul class="suggestions-list">' +
                 '<li ng-repeat="suggestion in ctrl.suggestions track by $index" ng-class="suggestion" ng-click="ctrl.goToTicketView($index)"><a ui-sref="ticket({ticketId: suggestion.getTicketId()})">{{suggestion.getTicketTitle()}}</a></li>' +
               '</ul>',
     controller: SearchDirectiveController,
-    controllerAs: 'ctrl'
+    controllerAs: 'ctrl',
+    bindToController: true
   };
 }

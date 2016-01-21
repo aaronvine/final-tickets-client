@@ -1,7 +1,5 @@
-import TicketList from '../common/ticketList';
-import Ticket from '../common/ticket';
+import Generator from '../common/generator';
 import SearchDriver from './search-driver';
-import TicketsService from '../tickets.srv';
 
 describe('search directive', function () {
 
@@ -10,23 +8,22 @@ describe('search directive', function () {
   });
 
   it('should contain a relevant title', function () {
-    let searchDrive = SearchDriver.build();
+    let tickets = Generator.generateRandomTicketList();
+    let searchDrive = SearchDriver.build(tickets);
     expect(searchDrive.getTitle()).toBe('Search For A Ticket');
   });
 
   it('should contain a search input element', function () {
-    let searchDrive = SearchDriver.build();
+    let tickets = Generator.generateRandomTicketList();
+    let searchDrive = SearchDriver.build(tickets);
     expect(searchDrive.getInput().length).toBeGreaterThan(0);
   });
 
-  it('should show the result according to the search phrase', inject (function (ticketsService: TicketsService) {
-    let searchDrive = SearchDriver.build();
-    let items = TicketList.generateRandomTicketList();
-    spyOn(ticketsService, 'getTicketsPromise').and.returnValue(Q.defer().resolve);
-    spyOn(ticketsService, 'getGlobalTicketsList').and.returnValue(items);
-    searchDrive.clickOnInput();
+  it('should show the result according to the search phrase', function () {
+    let tickets = Generator.generateRandomTicketList();
+    let searchDrive = SearchDriver.build(tickets);
     searchDrive.inputSearchPhrase('he');
     expect(searchDrive.getSuggestions().length).toBe(2);
-  }));
+  });
 
 });

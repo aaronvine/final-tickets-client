@@ -1,13 +1,12 @@
 /// <reference path='../typings/tsd.d.ts' />
 
 import Ticket from './common/ticket';
-import TicketList from '././common/ticketList';
+import Reply from './common/reply';
 
 class TicketsService {
 
   greetingsMessage: string;
-  globalTicketList: TicketList;
-  ticketsPromise = Q.defer();
+  globalTicketList: Ticket[];
   ticketSubmitPromise = Q.defer();
   replySubmitPromise = Q.defer();
 
@@ -15,50 +14,58 @@ class TicketsService {
     this.greetingsMessage = 'default';
   }
 
-  getGlobalTicketsList(): TicketList {
+  getGlobalTicketsList(): Ticket[] {
     return this.globalTicketList;
   }
 
   getGreetingsMessage(): ng.IPromise<string> {
-    console.log('getting message from server');
+    console.log('TicketsService is getting greetings message from server');
     return this.$http.get('http://localhost:3000/test')
       .then((res) => res.data);
   }
 
   getTicketsFromServer(): ng.IPromise<JSON> {
-    console.log('getting tickets from server');
+    console.log('TicketsService is getting tickets from server');
     return this.$http.get('http://localhost:3000/tickets')
       .then((res) => res.data);
   }
 
-  buildTicketsListFromJson(json: JSON): TicketList {
-    console.log('building json: ', JSON.stringify(json));
+  buildRepliesListFromJson(json: JSON): Reply[] {
+    console.log('TicketsService is building replies json: ', JSON.stringify(json));
+    let numOfReplies = Object.keys(json).length;
+    let repliesList = Array.apply(null, Array(numOfReplies)).map(function(item, index) {
+      return new Reply(json[index].content, json[index].userEmail);
+    });
+    console.log('TicketsService built the replies list: ', repliesList);
+    return repliesList;
+  }
+
+  buildTicketsListFromJson(json: JSON): Ticket[] {
+    console.log('TicketsService is building ticket json: ', JSON.stringify(json));
     let numOfTickets = Object.keys(json).length;
-    this.globalTicketList = new TicketList(Array.apply(null, Array(numOfTickets)).map(function(item, index) {
+    this.globalTicketList = Array.apply(null, Array(numOfTickets)).map(function(item, index) {
       return new Ticket(json[index].id, json[index].title, json[index].content, json[index].userEmail, json[index].replies);
-    }));
-    console.log('built TicketList: ', this.globalTicketList);
+    });
+    console.log('TicketsService built the tickets list: ', this.globalTicketList);
     return this.globalTicketList;
   }
 
+  getRepliesFromServer(ticketId: string): ng.IPromise<JSON> {
+    console.log('TicketsService is getting replies from server');
+    return this.$http.get('http://localhost:3000/tickets/' + ticketId + '/replies')
+      .then((res) => res.data);
+  }
+
   postNewTicketToServer(newTicket: {}): void {
-    console.log('sending a new ticket to the server: ', JSON.stringify(newTicket));
+    console.log('TicketsService is sending a new ticket to the server: ', JSON.stringify(newTicket));
     this.$http.post('http://localhost:3000/tickets', JSON.stringify(newTicket));
     this.ticketSubmitPromise.resolve();
   }
 
   postNewReplyToServer(ticketId: string, newReply: {}): void {
-    console.log('sending a new reply to the server: ', JSON.stringify(newReply));
+    console.log('TicketsService is sending a new reply to the server: ', JSON.stringify(newReply));
     this.$http.post('http://localhost:3000/tickets/' + ticketId + '/replies', JSON.stringify(newReply));
     this.replySubmitPromise.resolve();
-  }
-
-  getTicketsPromise() {
-      return this.ticketsPromise.promise;
-  }
-
-  setTicketsPromise() {
-      this.ticketsPromise = Q.defer();
   }
 
   getTicketSubmitPromise() {

@@ -5,6 +5,7 @@ import Ticket from '../../common/ticket';
 class ReplySubmitDirectiveController {
   newReply: {};
   isSubmitted: boolean;
+  title = 'Add a new Reply';
 
   /* @ngInject */
   constructor(private ticketsService: TicketsService, private $state: any) {
@@ -16,10 +17,9 @@ class ReplySubmitDirectiveController {
     console.log('id: ', id);
     this.isSubmitted = true;
     this.ticketsService.postNewReplyToServer(id, this.newReply);
-    //maybe should clear the newReply field
     this.ticketsService.getReplySubmitPromise()
     .then(() => {
-      this.$state.go('home');
+      this.$state.go('ticket', {ticketId: id}, {reload: true});
     });
   }
 }
@@ -30,7 +30,7 @@ export default function ReplySubmitDirectiveFactory(): ng.IDirective {
     scope: {
       id: '@',
     },
-    template: '<h3>Add a new Reply:</h3>' +
+    template: '<h3>{{ctrl.title}}</h3>' +
               '<form name="submitReplyForm" class="form" ng-submit="ctrl.submitNewReply(submitReplyForm.$valid, id)" novalidate>' +
                 '<div class="form-group">' +
                   '<label>Email address</label>' +

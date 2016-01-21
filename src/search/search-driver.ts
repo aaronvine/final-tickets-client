@@ -1,6 +1,5 @@
 /// <reference path='../../typings/tsd.d.ts'/>
-import TicketList from '../common/ticketList';
-import TicketsService from '../tickets.srv';
+import Ticket from '../common/ticket';
 
 export default class SearchDriver {
 
@@ -12,11 +11,12 @@ export default class SearchDriver {
     this.scope = scope;
   }
 
-  static build(): SearchDriver {
+  static build(tickets: Ticket[]): SearchDriver {
     let elem, scope : any;
-    inject(($rootScope, $compile, ticketsService: TicketsService) => {
+    inject(($rootScope, $compile) => {
       scope = $rootScope.$new();
-      elem = $compile('<search></search>')(scope);
+      scope.tickets = tickets;
+      elem = $compile('<search tickets="tickets"></search>')(scope);
       scope.$digest();
     });
     return new SearchDriver(elem, scope);
@@ -26,7 +26,7 @@ export default class SearchDriver {
     return this.elem.find('h3').text();
   }
 
-  getInput(): any {
+  getInput(): JQuery {
     return this.elem.find('input');
   }
 
@@ -35,7 +35,8 @@ export default class SearchDriver {
   }
 
   inputSearchPhrase(searchPhrase: string): void {
-    //TODO
+    this.getInput().val(searchPhrase);
+    this.scope.$digest();
   };
 
   getSuggestions(): any {
