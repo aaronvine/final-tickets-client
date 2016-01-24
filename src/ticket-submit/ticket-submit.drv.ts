@@ -42,7 +42,8 @@ export default function TicketSubmitDirectiveFactory(): ng.IDirective {
                 '</div>' +
                 '<div class="form-group">' +
                   '<label>Content</label>' +
-                  '<textarea type="text" name="content" rows="5" class="form-control" ng-model="ctrl.newTicket.content"/></textarea>' +
+                  // '<textarea type="text" name="content" rows="5" class="form-control" ng-model="ctrl.newTicket.content"/></textarea>' +
+                  '<div text-angular name="content" ng-model="ctrl.newTicket.content" ta-text-editor-class="border-around" ta-html-editor-class="border-around"></div>' +
                 '</div>' +
                 '<div class="row">' +
                   '<div class="col">' +

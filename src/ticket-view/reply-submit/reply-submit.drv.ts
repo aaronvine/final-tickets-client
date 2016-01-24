@@ -1,5 +1,4 @@
 import TicketsService from '../../tickets.srv';
-import TicketList from '../../common/ticketList';
 import Ticket from '../../common/ticket';
 
 class ReplySubmitDirectiveController {

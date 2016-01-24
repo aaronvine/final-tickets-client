@@ -71,7 +71,7 @@ function LatestTicketsDirectiveFactory() {
         },
         template: '<h3>{{ctrl.title}}</h3>' +
             '<ul class="latest-tickets-list">' +
-            '<li class="ticket" ng-repeat="ticket in ctrl.tickets"><a ui-sref="ticket({ticketId: ticket.getTicketId()})"><label class="ticket-title">{{ticket.getTicketTitle()}}</label></a><br><pre class="ticket-content">{{ticket.getTicketContent().split("\n")[0]}}</pre></li>' +
+            '<li class="ticket" ng-repeat="ticket in ctrl.tickets"><a ui-sref="ticket({ticketId: ticket.getTicketId()})"><label class="ticket-title">{{ticket.getTicketTitle()}}</label></a><br><pre class="ticket-content">{{ticket.getTicketContent().split("\n")[0] | htmlToPlaintext}}</pre></li>' +
             '</ul>',
         controller: LatestTicketsDirectiveController,
         controllerAs: 'ctrl',
@@ -207,7 +207,8 @@ function TicketSubmitDirectiveFactory() {
             '</div>' +
             '<div class="form-group">' +
             '<label>Content</label>' +
-            '<textarea type="text" name="content" rows="5" class="form-control" ng-model="ctrl.newTicket.content"/></textarea>' +
+            // '<textarea type="text" name="content" rows="5" class="form-control" ng-model="ctrl.newTicket.content"/></textarea>' +
+            '<div text-angular name="content" ng-model="ctrl.newTicket.content" ta-text-editor-class="border-around" ta-html-editor-class="border-around"></div>' +
             '</div>' +
             '<div class="row">' +
             '<div class="col">' +
@@ -321,7 +322,7 @@ function TicketViewDirectiveFactory() {
             ticket: '='
         },
         template: '<h3>From: {{ctrl.ticket.getTicketUserEmail()}}</h3>' +
-            '<label class="ticket-title">{{ctrl.ticket.getTicketTitle()}}</label><br><pre class="ticket-content">{{ctrl.ticket.getTicketContent()}}</pre>' +
+            '<label class="ticket-title">{{ctrl.ticket.getTicketTitle()}}</label><br><pre class="ticket-content"><div ng-bind-html="ctrl.ticket.getTicketContent()"></div></pre>' +
             '<replies replies="ctrl.replies"></replies>' +
             '<reply-submit id="{{ctrl.ticketId}}"></reply-submit>',
         controller: TicketViewDirectiveController,
@@ -353,7 +354,7 @@ function ticketsRoutingConfig($stateProvider, $urlRouterProvider) {
             }
         },
         controller: function (tickets, greetingMessage) {
-            this.greeting = greetingMessage;
+            this.greetings = greetingMessage;
             this.tickets = tickets;
         },
         controllerAs: 'ctrl'
@@ -403,7 +404,7 @@ var replies_drv_1 = require('./ticket-view/replies/replies.drv');
 var reply_submit_drv_1 = require('./ticket-view/reply-submit/reply-submit.drv');
 var tickets_routing_config_1 = require('./tickets-routing.config');
 var tickets_srv_1 = require('./tickets.srv');
-angular.module('tickets', ['ui.router'])
+angular.module('tickets', ['ui.router', 'textAngular'])
     .service('ticketsService', tickets_srv_1["default"])
     .directive('latestTickets', latest_tickets_drv_1["default"])
     .directive('ticketView', ticket_view_drv_1["default"])
@@ -411,7 +412,12 @@ angular.module('tickets', ['ui.router'])
     .directive('search', search_drv_1["default"])
     .directive('replies', replies_drv_1["default"])
     .directive('replySubmit', reply_submit_drv_1["default"])
-    .config(tickets_routing_config_1["default"]);
+    .config(tickets_routing_config_1["default"])
+    .filter('htmlToPlaintext', function () {
+    return function (text) {
+        return text ? String(text).replace(/<[^>]+>/gm, ' ') : '';
+    };
+});
 
 },{"./latest-tickets/latest-tickets.drv":3,"./search/search.drv":4,"./ticket-submit/ticket-submit.drv":5,"./ticket-view/replies/replies.drv":6,"./ticket-view/reply-submit/reply-submit.drv":7,"./ticket-view/ticket-view.drv":8,"./tickets-routing.config":9,"./tickets.srv":11}],11:[function(require,module,exports){
 /// <reference path='../typings/tsd.d.ts' />

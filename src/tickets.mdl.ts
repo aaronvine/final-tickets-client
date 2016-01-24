@@ -9,7 +9,7 @@ import ReplySubmitDirectiveFactory from './ticket-view/reply-submit/reply-submit
 import ticketsRoutingConfig from './tickets-routing.config';
 import TicketsService from './tickets.srv';
 
-angular.module('tickets', ['ui.router'])
+angular.module('tickets', ['ui.router', 'textAngular'])
 .service('ticketsService', TicketsService)
 .directive('latestTickets', LatestTicketsDirectiveFactory)
 .directive('ticketView', TicketViewDirectiveFactory)
@@ -17,4 +17,9 @@ angular.module('tickets', ['ui.router'])
 .directive('search', SearchDirectiveFactory)
 .directive('replies', RepliesDirectiveFactory)
 .directive('replySubmit', ReplySubmitDirectiveFactory)
-.config(ticketsRoutingConfig);
+.config(ticketsRoutingConfig)
+.filter('htmlToPlaintext', function () {
+    return function(text) {
+      return  text ? String(text).replace(/<[^>]+>/gm, ' ') : '';
+    };
+  });

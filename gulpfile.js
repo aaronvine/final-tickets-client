@@ -8,6 +8,9 @@ var tsify = require('tsify');
 var browserify = require('browserify');
 var glob = require('glob');
 var Server = require('karma').Server;
+var protractor = require('gulp-protractor').protractor;
+var webdriverStandalone = require('gulp-protractor').webdriver_standalone;
+
 
 gulp.task('clean', function () {
     gulp.src('./dist/*', { read: false })
@@ -57,8 +60,16 @@ gulp.task('test', function (done) {
     }, done).start();
 });
 
+gulp.task('selenium', webdriverStandalone);
+
 gulp.task('e2e', function () {
-    //TODO
+    gulp.src(['./e2e/home-page-spec.js'])
+    .pipe(protractor({
+        configFile: './e2e/protractor.config.js'
+    }))
+    .on('error', function (e) {
+        throw e;
+    });
 });
 
 gulp.task('watch', function () {

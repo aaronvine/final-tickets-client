@@ -22,7 +22,7 @@ export default function ticketsRoutingConfig($stateProvider: ng.ui.IStateProvide
           }
         },
         controller: function (tickets: Ticket[], greetingMessage) {
-          this.greeting = greetingMessage;
+          this.greetings = greetingMessage;
           this.tickets = tickets;
         },
         controllerAs: 'ctrl'
