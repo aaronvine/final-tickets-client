@@ -1,6 +1,6 @@
 'use strict';
 
-describe('tickets homepage', function () {
+describe('tickets app', function () {
 
     beforeEach(function () {
         browser.get('http://localhost:8000/');
@@ -11,52 +11,55 @@ describe('tickets homepage', function () {
     });
 
     it('should greet the the user', function () {
-        var greetingMessage = $('h1');
-        expect(greetingMessage.getText()).toEqual('Welcome!');
+        expect($('h1').getText()).toEqual('Welcome!');
     });
 
     describe('search component', function () {
 
-        var searchBox;
+        var search;
         beforeEach(function () {
-            searchBox = $('search');
+            search = $('#input-search');
+            search.click();
         });
 
         it('should show a result when you enter a proper search phrase', function () {
-            var results;
-            var searchPhrase = 'h';
-            searchBox.click();
-            searchBox.sendKeys(searchPhrase);
-            results = $('.suggestion');
-            // todoList = element.all(by.repeater('todo in todos'));
-            expect(results.count()).toBeGreaterThan(0);
+            search.sendKeys('h');
+            expect($$('.suggestion').count()).toBeGreaterThan(0);
         });
 
         it('should not show a result when you enter nonsense', function () {
-            var results;
-            var searchPhrase = 'hadejjjkkkkk';
-            searchBox.click();
-            searchBox.sendKeys(searchPhrase);
-            results = $('.suggestion');
-            expect(results.count()).toBe(0);
+            search.sendKeys('hadejjjkkkkk');
+            expect($$('.suggestion').count()).toBe(0);
         });
 
     });
 
     it('should list the latest 5 tickets', function () {
-        var tickets = $('.tickets');
-        expect(tickets.cpunt()).toBe(5);
+        expect($$('.ticket').count()).toBe(5);
     });
 
-    // it('should add a todo', function() {
-    //   var addTodo = element(by.model('todoText'));
-    //   var addButton = element(by.css('[value="add"]'));
-    //
-    //   addTodo.sendKeys('write a protractor test');
-    //   addButton.click();
-    //
-    //   expect(todoList.count()).toEqual(3);
-    //   expect(todoList.get(2).getText()).toEqual('write a protractor test');
-    // });
+    it('should add a new ticket and show it on the latest tickets', function () {
+        $('#ticket-submit').click();
+        $('#input-ticket-title').click();
+        $('#input-ticket-title').sendKeys('protractor ticket test title');
+        $('#input-ticket-email').click();
+        $('#input-ticket-email').sendKeys('protractor@test.com');
+        $('#button-ticket-submit').click();
+        browser.ignoreSynchronization = true;
+        browser.waitForAngular();
+        expect($$('.ticket-title').get(4).getText()).toBe('protractor ticket test title');
+    });
+
+    it('should add a new reply and show it on ticket replies', function () {
+        $$('#ticket-view').get(3).click();
+        $('#input-reply-content').click();
+        $('#input-reply-content').sendKeys('protractor reply test content');
+        $('#input-reply-email').click();
+        $('#input-reply-email').sendKeys('protractor@test.com');
+        $('#button-reply-submit').click();
+        browser.ignoreSynchronization = true;
+        browser.waitForAngular();
+        expect($$('.reply-content').get(0).getText()).toBe('protractor reply test content');
+    });
 
 });

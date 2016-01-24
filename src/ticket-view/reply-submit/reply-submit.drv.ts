@@ -33,16 +33,16 @@ export default function ReplySubmitDirectiveFactory(): ng.IDirective {
               '<form name="submitReplyForm" class="form" ng-submit="ctrl.submitNewReply(submitReplyForm.$valid, id)" novalidate>' +
                 '<div class="form-group">' +
                   '<label>Email address</label>' +
-                  '<input type="email" name="userEmail" class="form-control" ng-model="ctrl.newReply.userEmail" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" required/>' +
+                  '<input type="email" name="userEmail" id="input-reply-email" class="form-control" ng-model="ctrl.newReply.userEmail" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" required/>' +
                   '<p ng-show="submitReplyForm.userEmail.$invalid" class="help-block">Enter a valid email address.</p>' +
                 '</div>' +
                 '<div class="form-group">' +
                   '<label>Content</label>' +
-                  '<textarea type="text" name="content" rows="5" class="form-control" ng-model="ctrl.newReply.content"/></textarea>' +
+                  '<textarea type="text" name="content" id="input-reply-content" rows="5" class="form-control" ng-model="ctrl.newReply.content"/></textarea>' +
                 '</div>' +
                 '<div class="row">' +
                   '<div class="col">' +
-                    '<button class="btn btn-success pull-right" ng-disabled="submitReplyForm.$invalid"><span class="glyphicon glyphicon-plus-sign"></span>   Add</button>' +
+                    '<button id="button-reply-submit" class="btn btn-success pull-right" ng-disabled="submitReplyForm.$invalid"><span class="glyphicon glyphicon-plus-sign"></span>   Add</button>' +
                   '</div>' +
                 '</div>' +
               '</form>',

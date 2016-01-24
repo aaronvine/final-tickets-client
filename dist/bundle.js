@@ -71,7 +71,7 @@ function LatestTicketsDirectiveFactory() {
         },
         template: '<h3>{{ctrl.title}}</h3>' +
             '<ul class="latest-tickets-list">' +
-            '<li class="ticket" ng-repeat="ticket in ctrl.tickets"><a ui-sref="ticket({ticketId: ticket.getTicketId()})"><label class="ticket-title">{{ticket.getTicketTitle()}}</label></a><br><pre class="ticket-content">{{ticket.getTicketContent().split("\n")[0] | htmlToPlaintext}}</pre></li>' +
+            '<li class="ticket" ng-repeat="ticket in ctrl.tickets"><a ui-sref="ticket({ticketId: ticket.getTicketId()})" id="ticket-view"><label class="ticket-title">{{ticket.getTicketTitle()}}</label></a><br><pre class="ticket-content">{{ticket.getTicketContent().split("\n")[0] | htmlToPlaintext}}</pre></li>' +
             '</ul>',
         controller: LatestTicketsDirectiveController,
         controllerAs: 'ctrl',
@@ -155,9 +155,9 @@ function SearchDirectiveFactory() {
             tickets: '='
         },
         template: '<h3>{{ctrl.title}}</h3>' +
-            '<input type="text" placeholder="Search for tickets" class="input" ng-keydown="ctrl.checkKeyDown($event)" ng-keyup="ctrl.checkKeyUp($event)" ng-model="ctrl.searchText" ng-change="ctrl.search()"/>' +
+            '<input type="text" placeholder="Search for tickets" id="input-search" class="input" ng-keydown="ctrl.checkKeyDown($event)" ng-keyup="ctrl.checkKeyUp($event)" ng-model="ctrl.searchText" ng-change="ctrl.search()"/>' +
             '<ul class="suggestions-list">' +
-            '<li ng-repeat="suggestion in ctrl.suggestions track by $index" ng-class="suggestion" ng-click="ctrl.goToTicketView($index)"><a ui-sref="ticket({ticketId: suggestion.getTicketId()})">{{suggestion.getTicketTitle()}}</a></li>' +
+            '<li ng-repeat="suggestion in ctrl.suggestions track by $index" class="suggestion" ng-click="ctrl.goToTicketView($index)"><a ui-sref="ticket({ticketId: suggestion.getTicketId()})">{{suggestion.getTicketTitle()}}</a></li>' +
             '</ul>',
         controller: SearchDirectiveController,
         controllerAs: 'ctrl',
@@ -197,22 +197,22 @@ function TicketSubmitDirectiveFactory() {
             '<form name="submitTicketForm" class="form" ng-submit="ctrl.submitNewTicket(submitTicketForm.$valid)" novalidate>' +
             '<div class="form-group">' +
             '<label>Title</label>' +
-            '<input type="text" name="title" class="form-control" ng-model="ctrl.newTicket.title" ng-minlength="3" ng-maxlength="50" required/>' +
+            '<input type="text" name="title" id="input-ticket-title" class="form-control" ng-model="ctrl.newTicket.title" ng-minlength="3" ng-maxlength="50" required/>' +
             '<p ng-show="submitTicketForm.title.$invalid" class="help-block">Title is required.</p>' +
             '</div>' +
             '<div class="form-group">' +
             '<label>Email address</label>' +
-            '<input type="email" name="userEmail" class="form-control" ng-model="ctrl.newTicket.userEmail" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" required/>' +
+            '<input type="email" name="userEmail" id="input-ticket-email" class="form-control" ng-model="ctrl.newTicket.userEmail" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" required/>' +
             '<p ng-show="submitTicketForm.userEmail.$invalid" class="help-block">Enter a valid email address.</p>' +
             '</div>' +
             '<div class="form-group">' +
             '<label>Content</label>' +
             // '<textarea type="text" name="content" rows="5" class="form-control" ng-model="ctrl.newTicket.content"/></textarea>' +
-            '<div text-angular name="content" ng-model="ctrl.newTicket.content" ta-text-editor-class="border-around" ta-html-editor-class="border-around"></div>' +
+            '<div text-angular name="content" id="input-ticket-content" ng-model="ctrl.newTicket.content" ta-text-editor-class="border-around" ta-html-editor-class="border-around"></div>' +
             '</div>' +
             '<div class="row">' +
             '<div class="col">' +
-            '<button class="btn btn-success pull-right" ng-disabled="submitTicketForm.$invalid"><span class="glyphicon glyphicon-plus-sign"></span>   Add</button>' +
+            '<button id="button-ticket-submit" class="btn btn-success pull-right" ng-disabled="submitTicketForm.$invalid"><span class="glyphicon glyphicon-plus-sign"></span>   Add</button>' +
             '</div>' +
             '</div>' +
             '</form>',
@@ -283,16 +283,16 @@ function ReplySubmitDirectiveFactory() {
             '<form name="submitReplyForm" class="form" ng-submit="ctrl.submitNewReply(submitReplyForm.$valid, id)" novalidate>' +
             '<div class="form-group">' +
             '<label>Email address</label>' +
-            '<input type="email" name="userEmail" class="form-control" ng-model="ctrl.newReply.userEmail" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" required/>' +
+            '<input type="email" name="userEmail" id="input-reply-email" class="form-control" ng-model="ctrl.newReply.userEmail" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" required/>' +
             '<p ng-show="submitReplyForm.userEmail.$invalid" class="help-block">Enter a valid email address.</p>' +
             '</div>' +
             '<div class="form-group">' +
             '<label>Content</label>' +
-            '<textarea type="text" name="content" rows="5" class="form-control" ng-model="ctrl.newReply.content"/></textarea>' +
+            '<textarea type="text" name="content" id="input-reply-content" rows="5" class="form-control" ng-model="ctrl.newReply.content"/></textarea>' +
             '</div>' +
             '<div class="row">' +
             '<div class="col">' +
-            '<button class="btn btn-success pull-right" ng-disabled="submitReplyForm.$invalid"><span class="glyphicon glyphicon-plus-sign"></span>   Add</button>' +
+            '<button id="button-reply-submit" class="btn btn-success pull-right" ng-disabled="submitReplyForm.$invalid"><span class="glyphicon glyphicon-plus-sign"></span>   Add</button>' +
             '</div>' +
             '</div>' +
             '</form>',
@@ -343,7 +343,7 @@ function ticketsRoutingConfig($stateProvider, $urlRouterProvider) {
         template: '<h1>{{ctrl.greetings}}</h1>' +
             '<search tickets="ctrl.tickets"></search>' +
             '<latest-tickets tickets="ctrl.tickets"></latest-tickets>' +
-            '<a ui-sref="submit"><b>Submit a new ticket</b></a>',
+            '<a ui-sref="submit" id="ticket-submit"><b>Submit a new ticket</b></a>',
         resolve: {
             tickets: function (ticketsService) {
                 return ticketsService.getTicketsFromServer()

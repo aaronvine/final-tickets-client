@@ -11,7 +11,7 @@ export default function ticketsRoutingConfig($stateProvider: ng.ui.IStateProvide
         template: '<h1>{{ctrl.greetings}}</h1>' +
                   '<search tickets="ctrl.tickets"></search>' +
                   '<latest-tickets tickets="ctrl.tickets"></latest-tickets>' +
-                  '<a ui-sref="submit"><b>Submit a new ticket</b></a>',
+                  '<a ui-sref="submit" id="ticket-submit"><b>Submit a new ticket</b></a>',
         resolve: {
           tickets: function (ticketsService: TicketsService) {
             return ticketsService.getTicketsFromServer()

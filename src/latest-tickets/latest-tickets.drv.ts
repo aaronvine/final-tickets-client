@@ -26,7 +26,7 @@ export default function LatestTicketsDirectiveFactory(): ng.IDirective {
     },
     template: '<h3>{{ctrl.title}}</h3>' +
               '<ul class="latest-tickets-list">' +
-                '<li class="ticket" ng-repeat="ticket in ctrl.tickets"><a ui-sref="ticket({ticketId: ticket.getTicketId()})"><label class="ticket-title">{{ticket.getTicketTitle()}}</label></a><br><pre class="ticket-content">{{ticket.getTicketContent().split("\n")[0] | htmlToPlaintext}}</pre></li>' +
+                '<li class="ticket" ng-repeat="ticket in ctrl.tickets"><a ui-sref="ticket({ticketId: ticket.getTicketId()})" id="ticket-view"><label class="ticket-title">{{ticket.getTicketTitle()}}</label></a><br><pre class="ticket-content">{{ticket.getTicketContent().split("\n")[0] | htmlToPlaintext}}</pre></li>' +
               '</ul>',
     controller: LatestTicketsDirectiveController,
     controllerAs: 'ctrl',

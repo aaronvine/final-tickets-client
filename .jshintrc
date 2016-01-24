@@ -23,6 +23,7 @@
     "require": false,
     "module": false,
     "$": false,
+    "$$": false,
     "window": false,
     "describe": false,
     "it": false,

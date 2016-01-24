@@ -79,9 +79,9 @@ export default function SearchDirectiveFactory(): ng.IDirective {
       tickets: '='
     },
     template: '<h3>{{ctrl.title}}</h3>' +
-              '<input type="text" placeholder="Search for tickets" class="input" ng-keydown="ctrl.checkKeyDown($event)" ng-keyup="ctrl.checkKeyUp($event)" ng-model="ctrl.searchText" ng-change="ctrl.search()"/>' +
+              '<input type="text" placeholder="Search for tickets" id="input-search" class="input" ng-keydown="ctrl.checkKeyDown($event)" ng-keyup="ctrl.checkKeyUp($event)" ng-model="ctrl.searchText" ng-change="ctrl.search()"/>' +
               '<ul class="suggestions-list">' +
-                '<li ng-repeat="suggestion in ctrl.suggestions track by $index" ng-class="suggestion" ng-click="ctrl.goToTicketView($index)"><a ui-sref="ticket({ticketId: suggestion.getTicketId()})">{{suggestion.getTicketTitle()}}</a></li>' +
+                '<li ng-repeat="suggestion in ctrl.suggestions track by $index" class="suggestion" ng-click="ctrl.goToTicketView($index)"><a ui-sref="ticket({ticketId: suggestion.getTicketId()})">{{suggestion.getTicketTitle()}}</a></li>' +
               '</ul>',
     controller: SearchDirectiveController,
     controllerAs: 'ctrl',
